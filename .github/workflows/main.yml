@@ -1,4 +1,4 @@
-name: Import Exynos9825 Targets
+name: Import prebuilts
 
 on:
   workflow_dispatch:
@@ -7,12 +7,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: import-exynos9825-targets
+  group: import-prebuilts
   cancel-in-progress: false
 
 jobs:
   import-targets:
-    name: Import Exynos9825 Targets
+    name: Import prebuilts
     runs-on: ubuntu-latest
 
     steps:
@@ -36,64 +36,41 @@ jobs:
             https://github.com/Devandroid-bit/DevandroidROM.git \
             source-repo
 
-      - name: Import target
+      - name: Import prebuilts
         run: |
           set -e
 
-          SOURCE_DIR="source-repo/target"
-          DEST_DIR="target"
+          SOURCE_DIR="source-repo/prebuilts/samsung/p3sxxx"
+          DEST_DIR="prebuilts/samsung/p3sxxx"
 
           if [ ! -d "$SOURCE_DIR" ]; then
             echo "::error::Source directory does not exist: $SOURCE_DIR"
             exit 1
           fi
 
-          echo "Removing existing target..."
+          echo "Removing existing prebuilts/samsung/p3sxxx..."
           rm -rf "$DEST_DIR"
 
           echo "Creating destination directory..."
           mkdir -p "$DEST_DIR"
 
-          echo "Copying target..."
+          echo "Copying prebuilts/samsung/p3sxxx..."
           rsync -a --delete "$SOURCE_DIR/" "$DEST_DIR/"
 
-          echo "target imported successfully."
-
-      - name: Import platforms/exynos9825
-        run: |
-          set -e
-
-          SOURCE_DIR="source-repo/platform/exynos9825"
-          DEST_DIR="platform/exynos9825"
-
-          if [ ! -d "$SOURCE_DIR" ]; then
-            echo "::error::Source directory does not exist: $SOURCE_DIR"
-            exit 1
-          fi
-
-          echo "Removing existing platforms/exynos9825..."
-          rm -rf "$DEST_DIR"
-
-          echo "Creating destination directory..."
-          mkdir -p "$DEST_DIR"
-
-          echo "Copying platform/exynos9825..."
-          rsync -a --delete "$SOURCE_DIR/" "$DEST_DIR/"
-
-          echo "platform/exynos9825 imported successfully."
+          echo "prebuilts/samsung/p3sxxx imported successfully."
 
       - name: Check imported files
         run: |
           echo "Target files:"
           find target -type f | wc -l
 
-          echo "Exynos9825 files:"
-          find platform/exynos9825 -type f | wc -l
+          echo "prebuilts/samsung/p3sxxx files:"
+          find prebuilts/samsung/p3sxxx -type f | wc -l
 
       - name: Check for changes
         id: changes
         run: |
-          git add -A target platform/exynos9825
+          git add -A prebuilts/samsung/p3sxxx
 
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -107,8 +84,7 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         run: |
           git commit \
-            -m "init exynos9825 and targets" \
-            -m "Credits: @Ocin4ever"
+            -m "init prebuilts p3sxxx"
 
       - name: Rebase sixteenQPR2
         if: steps.changes.outputs.changed == 'true'
